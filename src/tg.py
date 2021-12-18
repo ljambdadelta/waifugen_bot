@@ -1,7 +1,7 @@
 #!/usr/bin/python3.8
 import urllib, random
 
-from os import makedirs
+from os import makedirs, environ
 from os.path import join
 
 from aiogram import Bot, Dispatcher, executor, types
@@ -9,8 +9,8 @@ from aiogram.types import InputFile
 
 from src import WaifuGen
 
-API_TOKEN = ""
-PIC_DIR = "pics"
+API_TOKEN = environ["WAIFU_BOT_TOKEN"]
+PIC_DIR = join(".", "pics")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
