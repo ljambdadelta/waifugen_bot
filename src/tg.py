@@ -1,9 +1,16 @@
 #!/usr/bin/python3.8
+import urllib, random
+
+from os import makedirs
+from os.path import join
+
 from aiogram import Bot, Dispatcher, executor, types
 from aiogram.types import InputFile
-import WaifuGen
-import urllib, random
-API_TOKEN = ''
+
+from src import WaifuGen
+
+API_TOKEN = ""
+PIC_DIR = "pics"
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
@@ -15,7 +22,7 @@ Waifu-Generator bot 0.1 is ready to serve
 
 
 - I WANT WAIFU
-    : type it and see what our gacha gonna roll 
+    : type it and see what our gacha gonna roll
 - /roll easy|medium|hard
     : choose your desiny""")
 
@@ -42,34 +49,36 @@ def _getPic():
         return out_img_name
 
 def _roll(lvl):
-  wg = WaifuGen.WaifuGen()
+  wg = WaifuGen()
   try:
     waifu = '\n'.join(wg.roll(level = lvl))
   except:
     try:
       waifu = '\n'.join(wg.roll(money = int(lvl)))
     except:
-      return "/opt/waifu/err.png", "No. We don't serve this. Try to read /help."
+      return (join(PIC_DIR, "err.png"), "No. We don't serve this. Try to read /help.")
   while True:
    try:
     msg = f""" Here it is, yours only wife:\n\n{waifu} """
     out_img_name = _getPic()
-    local_src = f"/opt/waifu/{out_img_name}"
+    local_src = join(PIC_DIR, out_img_name)
     return local_src, msg
    except:
     pass
 
-@dp.message_handler(commands=['roll',])    
+@dp.message_handler(commands=['roll',])
 async def react(message: types.Message):
   local_src, msg = _roll(message.text.split()[1])
   await message.answer_photo(photo=InputFile(local_src), caption = msg)
 
 
-@dp.message_handler(regexp='I WANT WAIFU')    
+@dp.message_handler(regexp='I WANT WAIFU')
 async def react(message: types.Message):
   local_src, msg = _roll("hard")
   await message.answer_photo(photo=InputFile(local_src), caption = msg)
 
+def run():
+    executor.start_polling(dp, skip_updates=True)
 
 if __name__ == '__main__':
-    executor.start_polling(dp, skip_updates=True)
+    run()
